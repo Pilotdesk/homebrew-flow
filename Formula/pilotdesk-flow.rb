@@ -65,6 +65,12 @@ class PilotdeskFlow < Formula
     bin.install     "bin/flow"
     libexec.install "lib", "share", "env-templates", "skills"
 
+    # Expose flow-init.sh at the conventional <prefix>/share path so the
+    # shell-rc snippet `source $(brew --prefix pilotdesk-flow)/share/flow-init.sh`
+    # resolves without a `libexec/` segment.
+    share.mkpath
+    share.install_symlink libexec/"share/flow-init.sh" => "flow-init.sh"
+
     # Pin PILOTDESK_FLOW_HOME to libexec so the auto-detection in bin/flow
     # doesn't walk back to the brew Cellar prefix.
     inreplace bin/"flow" do |s|
@@ -104,7 +110,7 @@ class PilotdeskFlow < Formula
       Source flow's shell init from your rc to enable `flow cd` and bump
       the per-shell FD limit:
 
-          source #{libexec}/share/flow-init.sh
+          source $(brew --prefix pilotdesk-flow)/share/flow-init.sh
 
       Then start the user-mode Caddy service:
 
