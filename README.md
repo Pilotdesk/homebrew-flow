@@ -10,9 +10,9 @@ Private Homebrew tap for [`pilotdesk-flow-cli`](https://github.com/Pilotdesk/pil
 export HOMEBREW_GITHUB_API_TOKEN=ghp_…
 
 brew tap pilotdesk/flow git@github.com:Pilotdesk/homebrew-flow.git
-brew install flow
-brew services start flow
-echo 'source $(brew --prefix flow)/share/flow-init.sh' >> ~/.zshrc
+brew install pilotdesk-flow
+brew services start pilotdesk-flow
+echo 'source $(brew --prefix pilotdesk-flow)/share/flow-init.sh' >> ~/.zshrc
 exec zsh
 
 flow doctor

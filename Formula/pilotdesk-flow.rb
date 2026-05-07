@@ -8,7 +8,7 @@
 #
 # without it, `brew install` fails with a 404 on the tarball download.
 
-class Flow < Formula
+class PilotdeskFlow < Formula
   desc "Pilotdesk flow CLI for isolated dev environments"
   homepage "https://github.com/Pilotdesk/pilotdesk-flow-cli"
   url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.1.0.tar.gz"
