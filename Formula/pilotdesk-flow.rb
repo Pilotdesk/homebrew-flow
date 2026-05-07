@@ -11,7 +11,8 @@
 class PilotdeskFlow < Formula
   desc "Pilotdesk flow CLI for isolated dev environments"
   homepage "https://github.com/Pilotdesk/pilotdesk-flow-cli"
-  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.1.0.tar.gz"
+  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.1.0.tar.gz",
+           using: GitHubPrivateRepositoryDownloadStrategy
   sha256   "f08d995294f2cfbf01c47f5b8c8f02cbdbc65ff4a492dde47cb4c4411ba64a5c"
   version  "0.1.0"
   license  "MIT"
