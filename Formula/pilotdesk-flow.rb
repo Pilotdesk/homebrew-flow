@@ -2,11 +2,53 @@
 # Source: https://github.com/Pilotdesk/pilotdesk-flow-cli
 #
 # Both this tap and the source repo are PRIVATE GitHub repos. Installers
-# need a GitHub token with `repo` scope:
+# need a GitHub token with `repo` scope, exported as HOMEBREW_GITHUB_API_TOKEN:
 #
-#     export HOMEBREW_GITHUB_API_TOKEN=ghp_…
+#     export HOMEBREW_GITHUB_API_TOKEN=$(gh auth token)
 #
-# without it, `brew install` fails with a 404 on the tarball download.
+# Without it, the inline GitHubPrivateRepositoryDownloadStrategy below
+# raises a clear error rather than letting the unauth'd curl 404.
+
+require "download_strategy"
+
+class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
+  def initialize(url, name, version, **meta)
+    super
+    parse_url_pattern
+    set_github_token
+  end
+
+  def parse_url_pattern
+    pattern = %r{https://github\.com/([^/]+)/([^/]+)/(\S+)}
+    unless @url =~ pattern
+      raise CurlDownloadStrategyError, "Invalid GitHub URL: #{@url}"
+    end
+    _, @owner, @repo, @filepath = *@url.match(pattern)
+  end
+
+  def set_github_token
+    @github_token = ENV["HOMEBREW_GITHUB_API_TOKEN"]
+    return if @github_token
+
+    raise CurlDownloadStrategyError, <<~MSG
+      HOMEBREW_GITHUB_API_TOKEN is required to install from a private repo.
+      Run:
+          export HOMEBREW_GITHUB_API_TOKEN=$(gh auth token)
+      then retry brew install.
+    MSG
+  end
+
+  # Embed the token in the URL so curl auths during the redirect chain.
+  def download_url
+    "https://#{@github_token}@github.com/#{@owner}/#{@repo}/#{@filepath}"
+  end
+
+  private
+
+  def _fetch(url:, resolved_url:, timeout:)
+    curl_download download_url, to: temporary_path, timeout: timeout
+  end
+end
 
 class PilotdeskFlow < Formula
   desc "Pilotdesk flow CLI for isolated dev environments"
@@ -29,7 +71,7 @@ class PilotdeskFlow < Formula
       s.gsub! /^PILOTDESK_FLOW_HOME=.*$/, "PILOTDESK_FLOW_HOME=\"#{libexec}\""
     end
 
-    # Pre-create a Caddyfile stub so `brew services start flow` succeeds
+    # Pre-create a Caddyfile stub so `brew services start` succeeds
     # before the user has run their first `flow up`.
     state_dir = "#{Dir.home}/.pilotdesk-flow"
     cf        = "#{state_dir}/Caddyfile"
@@ -66,7 +108,7 @@ class PilotdeskFlow < Formula
 
       Then start the user-mode Caddy service:
 
-          brew services start flow
+          brew services start pilotdesk-flow
 
       Verify with:
 
