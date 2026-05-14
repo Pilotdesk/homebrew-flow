@@ -53,17 +53,17 @@ end
 class PilotdeskFlow < Formula
   desc "Pilotdesk flow CLI for isolated dev environments"
   homepage "https://github.com/Pilotdesk/pilotdesk-flow-cli"
-  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.1.8.tar.gz",
+  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.2.0.tar.gz",
            using: GitHubPrivateRepositoryDownloadStrategy
-  sha256   "0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5"
-  version  "0.1.8"
+  sha256   "ba13b5662f7af802dc27395a804b0be3753982adfec1a81d3e68de930d6eeace"
+  version  "0.2.0"
   license  "MIT"
 
   depends_on "caddy"
 
   def install
     bin.install     "bin/flow"
-    libexec.install "lib", "share", "env-templates", "skills"
+    libexec.install "lib", "share", "skills"
 
     # Expose flow-init.sh at the conventional <prefix>/share path so the
     # shell-rc snippet `source $(brew --prefix pilotdesk-flow)/share/flow-init.sh`
