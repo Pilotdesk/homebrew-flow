@@ -53,10 +53,10 @@ end
 class PilotdeskFlow < Formula
   desc "Pilotdesk flow CLI for isolated dev environments"
   homepage "https://github.com/Pilotdesk/pilotdesk-flow-cli"
-  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.5.1.tar.gz",
+  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.5.2.tar.gz",
            using: GitHubPrivateRepositoryDownloadStrategy
-  sha256   "8b78c996caa1ead4bb152b17d56aff41a6254ac0b7301f3537fe1654ae3ca97a"
-  version  "0.5.1"
+  sha256   "0346ade54e19bb44ef19df53ac379393859965aaf6975c4c413f9f635223a874"
+  version  "0.5.2"
   license  "MIT"
 
   depends_on "caddy"
@@ -91,9 +91,10 @@ class PilotdeskFlow < Formula
             admin 127.0.0.1:2019
         }
 
-        # Dashboard — reachable at https://flow.localtest.me even before
-        # the first `flow up` regenerates this file.
-        https://flow.localtest.me {
+        # Dashboard — reachable at https://flow.localtest.me:7443 even
+        # before the first `flow up` regenerates this file. :7443 (not :443)
+        # because macOS denies non-root binds to <1024.
+        https://flow.localtest.me:7443 {
             bind 127.0.0.1
             tls internal
             reverse_proxy 127.0.0.1:7777
@@ -132,7 +133,7 @@ class PilotdeskFlow < Formula
 
       Open the dashboard:
 
-          https://flow.localtest.me
+          https://flow.localtest.me:7443
 
       (Run `caddy trust` once if you haven't, so the cert is accepted.)
 
