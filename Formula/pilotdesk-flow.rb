@@ -53,10 +53,10 @@ end
 class PilotdeskFlow < Formula
   desc "Pilotdesk flow CLI for isolated dev environments"
   homepage "https://github.com/Pilotdesk/pilotdesk-flow-cli"
-  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.4.3.tar.gz",
+  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.5.0.tar.gz",
            using: GitHubPrivateRepositoryDownloadStrategy
-  sha256   "4a13a83ba6144a5de295d1a2f01ab7b04c3a67d2631a8cdd6b5920ddd264e3fa"
-  version  "0.4.3"
+  sha256   "aa3e53bf0b3a71cf55b3820865ba0525afa23454c3ab5d39c5509f0f2851d7e1"
+  version  "0.5.0"
   license  "MIT"
 
   depends_on "caddy"
@@ -97,12 +97,14 @@ class PilotdeskFlow < Formula
   end
 
   service do
-    run [HOMEBREW_PREFIX/"bin/caddy", "run",
-         "--config", "#{Dir.home}/.pilotdesk-flow/Caddyfile",
-         "--watch", "--adapter", "caddyfile"]
+    # One supervised process under launchd: `flow web --with-caddy` runs the
+    # dashboard HTTP server AND caddy together, with shared lifecycle. brew
+    # formulas only allow one `service` block, so we wrap both children
+    # behind a single PID rather than splitting into two formulas.
+    run [HOMEBREW_PREFIX/"bin/flow", "web", "--with-caddy", "--port", "7777"]
     keep_alive   true
-    log_path     var/"log/flow-caddy.log"
-    error_log_path var/"log/flow-caddy.err.log"
+    log_path     var/"log/flow-web.log"
+    error_log_path var/"log/flow-web.err.log"
   end
 
   def caveats
@@ -112,9 +114,14 @@ class PilotdeskFlow < Formula
 
           source $(brew --prefix pilotdesk-flow)/share/flow-init.sh
 
-      Then start the user-mode Caddy service:
+      Then start the user-mode flow service (caddy reverse proxy +
+      dashboard, under one PID):
 
           brew services start pilotdesk-flow
+
+      Open the dashboard:
+
+          http://localhost:7777
 
       Optional — wire the bundled /flow agent skill into Claude Code so
       it's auto-discovered:
