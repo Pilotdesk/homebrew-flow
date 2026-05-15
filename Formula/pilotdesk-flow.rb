@@ -53,10 +53,10 @@ end
 class PilotdeskFlow < Formula
   desc "Pilotdesk flow CLI for isolated dev environments"
   homepage "https://github.com/Pilotdesk/pilotdesk-flow-cli"
-  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.2.2.tar.gz",
+  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.3.0.tar.gz",
            using: GitHubPrivateRepositoryDownloadStrategy
-  sha256   "77f8efea8bd26ea0418ef0ed219a0a9eca3928c9faf459f128deab3d6bb2eae6"
-  version  "0.2.2"
+  sha256   "e68cdf1a6bd4e4a3f39d432eb73e310a8ba1e642266468a0de14ffc11c26d27c"
+  version  "0.3.0"
   license  "MIT"
 
   depends_on "caddy"
@@ -107,14 +107,19 @@ class PilotdeskFlow < Formula
 
   def caveats
     <<~EOS
-      Source flow's shell init from your rc to enable `flow cd` and bump
-      the per-shell FD limit:
+      Source flow's shell init from your rc to enable `flow cd`, the
+      cd-on-`flow up` wrapper, and the per-shell FD limit bump:
 
           source $(brew --prefix pilotdesk-flow)/share/flow-init.sh
 
       Then start the user-mode Caddy service:
 
           brew services start pilotdesk-flow
+
+      Optional — wire the bundled /flow agent skill into Claude Code so
+      it's auto-discovered:
+
+          flow skill install
 
       Verify with:
 
