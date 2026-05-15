@@ -53,10 +53,10 @@ end
 class PilotdeskFlow < Formula
   desc "Pilotdesk flow CLI for isolated dev environments"
   homepage "https://github.com/Pilotdesk/pilotdesk-flow-cli"
-  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.5.2.tar.gz",
+  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.6.0.tar.gz",
            using: GitHubPrivateRepositoryDownloadStrategy
-  sha256   "0346ade54e19bb44ef19df53ac379393859965aaf6975c4c413f9f635223a874"
-  version  "0.5.2"
+  sha256   "3b2bb0e02d1d68e723e2214ab3f8f453da79282ccffb2cf93b4b589286774491"
+  version  "0.6.0"
   license  "MIT"
 
   depends_on "caddy"
@@ -141,6 +141,12 @@ class PilotdeskFlow < Formula
       it's auto-discovered:
 
           flow skill install
+
+      Optional — install the SwiftBar menu-bar dropdown:
+
+          brew install --cask swiftbar
+          open -a SwiftBar
+          flow toolbar install
 
       Verify with:
 
