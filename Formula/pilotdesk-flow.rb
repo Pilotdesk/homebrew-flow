@@ -53,10 +53,10 @@ end
 class PilotdeskFlow < Formula
   desc "Pilotdesk flow CLI for isolated dev environments"
   homepage "https://github.com/Pilotdesk/pilotdesk-flow-cli"
-  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.3.0.tar.gz",
+  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.4.0.tar.gz",
            using: GitHubPrivateRepositoryDownloadStrategy
-  sha256   "e68cdf1a6bd4e4a3f39d432eb73e310a8ba1e642266468a0de14ffc11c26d27c"
-  version  "0.3.0"
+  sha256   "98f1b0dcd6e6367f2514408c806b8ac23eab1cdc873f918fa8cddad38ce4b8c3"
+  version  "0.4.0"
   license  "MIT"
 
   depends_on "caddy"
