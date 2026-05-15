@@ -53,10 +53,10 @@ end
 class PilotdeskFlow < Formula
   desc "Pilotdesk flow CLI for isolated dev environments"
   homepage "https://github.com/Pilotdesk/pilotdesk-flow-cli"
-  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.5.0.tar.gz",
+  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.5.1.tar.gz",
            using: GitHubPrivateRepositoryDownloadStrategy
-  sha256   "aa3e53bf0b3a71cf55b3820865ba0525afa23454c3ab5d39c5509f0f2851d7e1"
-  version  "0.5.0"
+  sha256   "8b78c996caa1ead4bb152b17d56aff41a6254ac0b7301f3537fe1654ae3ca97a"
+  version  "0.5.1"
   license  "MIT"
 
   depends_on "caddy"
@@ -87,8 +87,16 @@ class PilotdeskFlow < Formula
         # Auto-generated stub. Replaced on first `flow up`.
 
         {
-            auto_https off
+            auto_https disable_redirects
             admin 127.0.0.1:2019
+        }
+
+        # Dashboard — reachable at https://flow.localtest.me even before
+        # the first `flow up` regenerates this file.
+        https://flow.localtest.me {
+            bind 127.0.0.1
+            tls internal
+            reverse_proxy 127.0.0.1:7777
         }
 
         # no flows registered yet
@@ -103,6 +111,9 @@ class PilotdeskFlow < Formula
     # behind a single PID rather than splitting into two formulas.
     run [HOMEBREW_PREFIX/"bin/flow", "web", "--with-caddy", "--port", "7777"]
     keep_alive   true
+    # launchd's default PATH omits the Homebrew prefix; without this, the
+    # supervisor can't find `caddy` (or `python3` from brew) and crash-loops.
+    environment_variables PATH: std_service_path_env
     log_path     var/"log/flow-web.log"
     error_log_path var/"log/flow-web.err.log"
   end
@@ -121,7 +132,9 @@ class PilotdeskFlow < Formula
 
       Open the dashboard:
 
-          http://localhost:7777
+          https://flow.localtest.me
+
+      (Run `caddy trust` once if you haven't, so the cert is accepted.)
 
       Optional — wire the bundled /flow agent skill into Claude Code so
       it's auto-discovered:
