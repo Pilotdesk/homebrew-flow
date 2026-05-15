@@ -53,13 +53,14 @@ end
 class PilotdeskFlow < Formula
   desc "Pilotdesk flow CLI for isolated dev environments"
   homepage "https://github.com/Pilotdesk/pilotdesk-flow-cli"
-  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.6.0.tar.gz",
+  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.7.0.tar.gz",
            using: GitHubPrivateRepositoryDownloadStrategy
-  sha256   "3b2bb0e02d1d68e723e2214ab3f8f453da79282ccffb2cf93b4b589286774491"
-  version  "0.6.0"
+  sha256   "9708ae09b0089f72cb2dc0e860849ece7736ec60e9e97831149f13f0715525ad"
+  version  "0.7.0"
   license  "MIT"
 
   depends_on "caddy"
+  depends_on cask: "swiftbar"
 
   def install
     bin.install     "bin/flow"
@@ -142,9 +143,9 @@ class PilotdeskFlow < Formula
 
           flow skill install
 
-      Optional — install the SwiftBar menu-bar dropdown:
+      Optional — install the SwiftBar menu-bar dropdown (SwiftBar is
+      already installed as a cask dep of this formula):
 
-          brew install --cask swiftbar
           open -a SwiftBar
           flow toolbar install
 
