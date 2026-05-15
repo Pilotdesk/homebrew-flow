@@ -60,7 +60,6 @@ class PilotdeskFlow < Formula
   license  "MIT"
 
   depends_on "caddy"
-  depends_on cask: "swiftbar"
 
   def install
     bin.install     "bin/flow"
@@ -143,11 +142,11 @@ class PilotdeskFlow < Formula
 
           flow skill install
 
-      Optional — install the SwiftBar menu-bar dropdown (SwiftBar is
-      already installed as a cask dep of this formula):
+      Optional — install the SwiftBar menu-bar dropdown:
 
-          open -a SwiftBar
-          flow toolbar install
+          brew install --cask swiftbar      # Homebrew formulas can't
+          open -a SwiftBar                  # depend on casks, so this
+          flow toolbar install              # is a separate step.
 
       Verify with:
 
