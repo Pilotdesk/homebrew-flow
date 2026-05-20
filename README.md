@@ -1,15 +1,15 @@
 # homebrew-flow
 
-Private Homebrew tap for [`pilotdesk-flow-cli`](https://github.com/Pilotdesk/pilotdesk-flow-cli).
+Public Homebrew tap for [`pilotdesk-flow-cli`](https://github.com/Pilotdesk/pilotdesk-flow-cli).
+
+The flow source repo stays private; releases are published as source
+tarballs to a public-read GCS bucket. The formula in this tap pins each
+release's sha256, so Homebrew refuses tampered tarballs.
 
 ## Install
 
 ```bash
-# Both this tap and the source repo are private. Make sure your GitHub
-# token has `repo` scope, then export it for Homebrew:
-export HOMEBREW_GITHUB_API_TOKEN=ghp_…
-
-brew tap pilotdesk/flow git@github.com:Pilotdesk/homebrew-flow.git
+brew tap pilotdesk/flow
 brew install pilotdesk-flow
 brew services start pilotdesk-flow
 echo 'source $(brew --prefix pilotdesk-flow)/share/flow-init.sh' >> ~/.zshrc
@@ -18,16 +18,24 @@ exec zsh
 flow doctor
 ```
 
-## Updating the formula
+No GitHub token, no SSH key — `brew tap` reads this public repo, and
+`brew install` downloads the tarball directly from
+`storage.googleapis.com`.
 
-When `Pilotdesk/pilotdesk-flow-cli` cuts a new tag (e.g. `v0.2.0`):
+## How releases land here
 
-```bash
-TAG=v0.2.0
-URL="https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/${TAG}.tar.gz"
-TOKEN=$(gh auth token)
-SHA=$(curl -sL -H "Authorization: token $TOKEN" "$URL" | shasum -a 256 | awk '{print $1}')
-echo "$TAG → $SHA"
-```
+`Pilotdesk/pilotdesk-flow-cli`'s release workflow does the publishing:
 
-Update `Formula/flow.rb`'s `url`, `version`, and `sha256` lines and commit.
+1. Engineer bumps `VERSION` in the source repo and merges to `main`.
+2. CI tags `v<version>`, builds the source tarball, uploads it to
+   `gs://pilotdesk-flow-releases-swivel-labs/v<version>/`.
+3. CI opens a PR against this repo bumping `Formula/pilotdesk-flow.rb`'s
+   `url`, `sha256`, and `version`.
+4. A human reviews the PR and merges. That review is the supply-chain
+   checkpoint — never auto-merge.
+
+## Branch protection
+
+`main` requires PR + 1 review + signed commits. No direct pushes, even
+by admins. Formula bumps are the highest-value attack vector — keep
+this tight.
