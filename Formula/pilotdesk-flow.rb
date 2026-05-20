@@ -1,61 +1,16 @@
-# Homebrew formula for the pilotdesk-flow-cli.
-# Source: https://github.com/Pilotdesk/pilotdesk-flow-cli
+# Reference copy of Formula/pilotdesk-flow.rb for the Pilotdesk/homebrew-flow
+# tap. Not consumed by this repo — copy-paste into the tap when the tap
+# repo flips to public and the release pipeline is live.
 #
-# Both this tap and the source repo are PRIVATE GitHub repos. Installers
-# need a GitHub token with `repo` scope, exported as HOMEBREW_GITHUB_API_TOKEN:
-#
-#     export HOMEBREW_GITHUB_API_TOKEN=$(gh auth token)
-#
-# Without it, the inline GitHubPrivateRepositoryDownloadStrategy below
-# raises a clear error rather than letting the unauth'd curl 404.
-
-require "download_strategy"
-
-class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
-  def initialize(url, name, version, **meta)
-    super
-    parse_url_pattern
-    set_github_token
-  end
-
-  def parse_url_pattern
-    pattern = %r{https://github\.com/([^/]+)/([^/]+)/(\S+)}
-    unless @url =~ pattern
-      raise CurlDownloadStrategyError, "Invalid GitHub URL: #{@url}"
-    end
-    _, @owner, @repo, @filepath = *@url.match(pattern)
-  end
-
-  def set_github_token
-    @github_token = ENV["HOMEBREW_GITHUB_API_TOKEN"]
-    return if @github_token
-
-    raise CurlDownloadStrategyError, <<~MSG
-      HOMEBREW_GITHUB_API_TOKEN is required to install from a private repo.
-      Run:
-          export HOMEBREW_GITHUB_API_TOKEN=$(gh auth token)
-      then retry brew install.
-    MSG
-  end
-
-  # Embed the token in the URL so curl auths during the redirect chain.
-  def download_url
-    "https://#{@github_token}@github.com/#{@owner}/#{@repo}/#{@filepath}"
-  end
-
-  private
-
-  def _fetch(url:, resolved_url:, timeout:)
-    curl_download download_url, to: temporary_path, timeout: timeout
-  end
-end
+# After publication the release workflow (.github/workflows/release.yml)
+# auto-PRs bumps to this file, so manual edits should only be needed for
+# structural changes (install steps, service block, caveats).
 
 class PilotdeskFlow < Formula
   desc "Pilotdesk flow CLI for isolated dev environments"
   homepage "https://github.com/Pilotdesk/pilotdesk-flow-cli"
-  url      "https://github.com/Pilotdesk/pilotdesk-flow-cli/archive/refs/tags/v0.7.6.tar.gz",
-           using: GitHubPrivateRepositoryDownloadStrategy
-  sha256   "cbecec7485937d2e791a0d1d4a36327aace61ba9b0f85e51cb15e0e8bebb8954"
+  url      "https://storage.googleapis.com/pilotdesk-flow-releases-swivel-labs/v0.7.6/pilotdesk-flow-v0.7.6.tar.gz"
+  sha256   "816992d3e392ce2accd7c89018b0ba2fcc57c4c853503145da1c916a15bea208"
   version  "0.7.6"
   license  "MIT"
 
