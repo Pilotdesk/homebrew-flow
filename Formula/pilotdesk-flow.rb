@@ -18,7 +18,9 @@ class PilotdeskFlow < Formula
 
   def install
     bin.install     "bin/flow"
-    libexec.install "lib", "share", "skills"
+    # VERSION must land at the install root (== PILOTDESK_FLOW_HOME below) so
+    # `flow version` can read it; without it the CLI prints "flow unknown".
+    libexec.install "lib", "share", "skills", "VERSION"
 
     # Expose flow-init.sh at the conventional <prefix>/share path so the
     # shell-rc snippet `source $(brew --prefix pilotdesk-flow)/share/flow-init.sh`
@@ -111,5 +113,8 @@ class PilotdeskFlow < Formula
 
   test do
     assert_match "Usage: flow", shell_output("#{bin}/flow help")
+    # Guards the VERSION-install step above: a missing VERSION file makes
+    # `flow version` fall back to "unknown".
+    assert_match version.to_s, shell_output("#{bin}/flow version")
   end
 end
