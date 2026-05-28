@@ -76,6 +76,21 @@ class PilotdeskFlow < Formula
     error_log_path var/"log/flow-web.err.log"
   end
 
+  def post_install
+    # The dashboard snapshots the services catalog into the launchd job's
+    # env at process start (see lib/main.py:cmd_web), so a `brew upgrade`
+    # that lands new services in lib/flow_cli/services.py is invisible to
+    # the running dashboard until it restarts. Auto-restart here so users
+    # don't have to remember `brew services restart` after every release.
+    # No-op when the service is `none` / `stopped`, so fresh installs and
+    # users who run `flow web` outside launchd are unaffected.
+    status = Utils.popen_read("brew", "services", "list")
+    return unless status.match?(/^pilotdesk-flow\s+started\b/)
+
+    ohai "Restarting pilotdesk-flow service to load the upgraded code"
+    system "brew", "services", "restart", "pilotdesk-flow"
+  end
+
   def caveats
     <<~EOS
       Source flow's shell init from your rc to enable `flow cd`, the
