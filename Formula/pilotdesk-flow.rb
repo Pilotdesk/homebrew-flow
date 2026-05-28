@@ -77,15 +77,19 @@ class PilotdeskFlow < Formula
   end
 
   def post_install
-    # The dashboard snapshots the services catalog into the launchd job's
-    # env at process start (see lib/main.py:cmd_web), so a `brew upgrade`
-    # that lands new services in lib/flow_cli/services.py is invisible to
-    # the running dashboard until it restarts. Auto-restart here so users
-    # don't have to remember `brew services restart` after every release.
-    # No-op when the service is `none` / `stopped`, so fresh installs and
-    # users who run `flow web` outside launchd are unaffected.
-    status = Utils.popen_read("brew", "services", "list")
-    return unless status.match?(/^pilotdesk-flow\s+started\b/)
+    # `brew upgrade` stops/unloads the launchd job before installing the new
+    # version, so by the time post_install runs `brew services list` shows
+    # the service as `none` even when the user had it running — the previous
+    # gate (`match? /started/`) silently skipped the restart and left users
+    # with no dashboard until they noticed and ran `brew services start`.
+    #
+    # The LaunchAgent plist symlink is a reliable "user opted in" marker:
+    # `brew services start` installs it, `brew services stop` removes it,
+    # and brew's internal pre-upgrade stop leaves it in place. So restart
+    # iff the symlink is present — fresh installs and users who have
+    # explicitly stopped the service are unaffected.
+    plist = "#{Dir.home}/Library/LaunchAgents/homebrew.mxcl.pilotdesk-flow.plist"
+    return unless File.exist?(plist)
 
     ohai "Restarting pilotdesk-flow service to load the upgraded code"
     system "brew", "services", "restart", "pilotdesk-flow"
