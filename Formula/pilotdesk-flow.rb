@@ -28,10 +28,18 @@ class PilotdeskFlow < Formula
     share.mkpath
     share.install_symlink libexec/"share/flow-init.sh" => "flow-init.sh"
 
-    # Pin PILOTDESK_FLOW_HOME to libexec so the auto-detection in bin/flow
-    # doesn't walk back to the brew Cellar prefix.
+    # Pin PILOTDESK_FLOW_HOME to the *stable* opt path (opt_libexec), not the
+    # version-pinned Cellar libexec. Two reasons:
+    #   1. The auto-detection in bin/flow would otherwise walk up to the brew
+    #      Cellar prefix root rather than landing on libexec.
+    #   2. opt_libexec (HOMEBREW_PREFIX/opt/<name>/libexec) is a symlink brew
+    #      repoints to the current version on every upgrade. The toolbar/skill
+    #      symlinks that `flow … install` creates against this path therefore
+    #      survive upgrades, instead of dangling when `brew cleanup` removes
+    #      the old Cellar dir — which forced a "repaired stale link" heal on
+    #      every single upgrade.
     inreplace bin/"flow" do |s|
-      s.gsub! /^PILOTDESK_FLOW_HOME=.*$/, "PILOTDESK_FLOW_HOME=\"#{libexec}\""
+      s.gsub! /^PILOTDESK_FLOW_HOME=.*$/, "PILOTDESK_FLOW_HOME=\"#{opt_libexec}\""
     end
 
     # Pre-create a Caddyfile stub so `brew services start` succeeds
