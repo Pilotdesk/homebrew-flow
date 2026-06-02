@@ -96,11 +96,33 @@ class PilotdeskFlow < Formula
     # and brew's internal pre-upgrade stop leaves it in place. So restart
     # iff the symlink is present — fresh installs and users who have
     # explicitly stopped the service are unaffected.
-    plist = "#{Dir.home}/Library/LaunchAgents/homebrew.mxcl.pilotdesk-flow.plist"
+    #
+    # Resolve the real user home from the passwd database, NOT Dir.home:
+    # Homebrew redirects $HOME to a sandbox temp dir during post_install, so
+    # Dir.home wouldn't find the user's actual ~/Library/LaunchAgents plist
+    # and the restart was silently skipped on every upgrade.
+    require "etc"
+    home = Etc.getpwuid(Process.uid).dir
+    plist = "#{home}/Library/LaunchAgents/homebrew.mxcl.pilotdesk-flow.plist"
     return unless File.exist?(plist)
 
     ohai "Restarting pilotdesk-flow service to load the upgraded code"
-    system "brew", "services", "restart", "pilotdesk-flow"
+    # Restart via launchctl, NOT `brew services restart`: a nested brew
+    # invoked inline here contends with the running transaction's lock and
+    # aborts mid-restart (stops the service but never starts it, leaving the
+    # dashboard down), and a backgrounded `&` workaround gets reaped when
+    # brew exits. `launchctl kickstart -k` restarts the already-loaded job
+    # in place — no brew recursion, no lock, no downtime. launchd respawns
+    # it from the plist's ProgramArguments (`#{HOMEBREW_PREFIX}/bin/flow`,
+    # which now resolves to the upgraded version).
+    # quiet_system (not system): a restart failure must never abort the
+    # install. Homebrew's `system` raises on non-zero; `quiet_system`
+    # returns false instead, so the rare "job not currently loaded" case
+    # downgrades to a hint rather than a failed upgrade.
+    label = "homebrew.mxcl.pilotdesk-flow"
+    unless quiet_system "/bin/launchctl", "kickstart", "-k", "gui/#{Process.uid}/#{label}"
+      opoo "Could not auto-restart pilotdesk-flow — run: brew services restart pilotdesk-flow"
+    end
   end
 
   def caveats
