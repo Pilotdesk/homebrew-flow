@@ -9,9 +9,9 @@
 class PilotdeskFlow < Formula
   desc "Pilotdesk flow CLI for isolated dev environments"
   homepage "https://github.com/Pilotdesk/pilotdesk-flow-cli"
-  url      "https://storage.googleapis.com/pilotdesk-flow-releases-swivel-labs/v0.31.0/pilotdesk-flow-v0.31.0.tar.gz"
-  sha256   "8bd71f2bc2b7079dcc01550fdc59bf738b136fb017e7df5ec657414fadd5ecac"
-  version  "0.31.0"
+  url      "https://storage.googleapis.com/pilotdesk-flow-releases-swivel-labs/v0.31.1/pilotdesk-flow-v0.31.1.tar.gz"
+  sha256   "666ca7db69554a3045e1dd3fd91113c99b9ddab40a6589bf6c4f272a90876f3e"
+  version  "0.31.1"
   license  "MIT"
 
   depends_on "caddy"
