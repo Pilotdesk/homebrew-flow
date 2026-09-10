@@ -9,9 +9,9 @@
 class PilotdeskFlow < Formula
   desc "Pilotdesk flow CLI for isolated dev environments"
   homepage "https://github.com/Pilotdesk/pilotdesk-flow-cli"
-  url      "https://storage.googleapis.com/pilotdesk-flow-releases-swivel-labs/v0.43.0/pilotdesk-flow-v0.43.0.tar.gz"
-  sha256   "54f7077d24028dac37b948b8f9799f6fd42df30411d8bb5c855a1dd215235f43"
-  version  "0.43.0"
+  url      "https://storage.googleapis.com/pilotdesk-flow-releases-swivel-labs/v0.44.0/pilotdesk-flow-v0.44.0.tar.gz"
+  sha256   "d0c593559d66b44bf73a29fc18433378de91e0deb53b1a6feeac95fe6a93d1ab"
+  version  "0.44.0"
   license  "MIT"
 
   depends_on "caddy"
@@ -20,7 +20,10 @@ class PilotdeskFlow < Formula
     bin.install     "bin/flow"
     # VERSION must land at the install root (== PILOTDESK_FLOW_HOME below) so
     # `flow version` can read it; without it the CLI prints "flow unknown".
-    libexec.install "lib", "share", "skills", "VERSION"
+    # CHANGELOG.md likewise: the dashboard renders it at /changelog, reading
+    # it from the install root, and without it that page says the changelog
+    # was not shipped with this install.
+    libexec.install "lib", "share", "skills", "VERSION", "CHANGELOG.md"
 
     # Expose flow-init.sh at the conventional <prefix>/share path so the
     # shell-rc snippet `source $(brew --prefix pilotdesk-flow)/share/flow-init.sh`
