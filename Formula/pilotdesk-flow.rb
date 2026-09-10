@@ -20,7 +20,10 @@ class PilotdeskFlow < Formula
     bin.install     "bin/flow"
     # VERSION must land at the install root (== PILOTDESK_FLOW_HOME below) so
     # `flow version` can read it; without it the CLI prints "flow unknown".
-    libexec.install "lib", "share", "skills", "VERSION"
+    # CHANGELOG.md likewise: the dashboard renders it at /changelog, reading
+    # it from the install root, and without it that page says the changelog
+    # was not shipped with this install.
+    libexec.install "lib", "share", "skills", "VERSION", "CHANGELOG.md"
 
     # Expose flow-init.sh at the conventional <prefix>/share path so the
     # shell-rc snippet `source $(brew --prefix pilotdesk-flow)/share/flow-init.sh`
